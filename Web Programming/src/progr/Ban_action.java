@@ -1,0 +1,68 @@
+package progr;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet implementation class Ban_action
+ */
+@WebServlet("/Ban_action")
+public class Ban_action extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public Ban_action() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		response.getWriter().append("Served at: ").append(request.getContextPath());
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		PreparedStatement prepared_stmt= null;
+	    int affectedrows=0;
+	    Connection c = null;
+	    String username = request.getParameter("username");
+	    PrintWriter out = response.getWriter();
+	    
+	    try {
+	    	c = DriverManager
+	        		.getConnection("jdbc:postgresql://localhost:5432/WEB_programming",
+	                        "postgres", "12345678910");
+	       
+			String sql="UPDATE users SET isactive=1 WHERE usertype!=1 AND username=?";
+			prepared_stmt = c.prepareStatement(sql);
+			prepared_stmt.setString(1, username);
+			affectedrows = prepared_stmt.executeUpdate();
+			
+			if (affectedrows==0)throw  new Exception();
+			out.println("<html><body><h1> Successfull!</h1> <br><form action='BanUser'><input type='submit'></form></body></html>");
+			
+			
+	    }catch(Exception e) {
+	    	response.sendRedirect("failBan.jsp");
+	    	
+	    }
+	}
+
+}
